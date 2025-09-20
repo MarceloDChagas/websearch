@@ -19,9 +19,21 @@ public class FileQueryReader {
      * Reads all queries from a file and returns them as a list.
      * @param sourceFile The file to read queries from
      * @return List of queries (lines from the file)
-     * @throws IOException if file reading fails
+     * @throws NullPointerException if sourceFile is null
+     * @throws FileNotFoundException if the file does not exist
+     * @throws IOException if file reading fails or file is not readable
      */
     public static List<String> readAllQueries(File sourceFile) throws IOException {
+        if (sourceFile == null) {
+            throw new NullPointerException("sourceFile is null");
+        }
+        if (!sourceFile.exists()) {
+            throw new FileNotFoundException("File does not exist: " + sourceFile);
+        }
+        if (!sourceFile.isFile() || !sourceFile.canRead()) {
+            throw new IOException("File is not readable: " + sourceFile);
+        }
+        
         List<String> queries = new ArrayList<>();
         
         try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
@@ -39,9 +51,24 @@ public class FileQueryReader {
      * This approach is memory-efficient for large files as it doesn't load all content into memory.
      * @param sourceFile The file to read queries from
      * @param processor The processor that will handle each query
-     * @throws IOException if file reading fails
+     * @throws NullPointerException if sourceFile or processor is null
+     * @throws FileNotFoundException if the file does not exist
+     * @throws IOException if file reading fails or file is not readable
      */
     public static void readAndProcessQueries(File sourceFile, QueryProcessor processor) throws IOException {
+        if (sourceFile == null) {
+            throw new NullPointerException("sourceFile is null");
+        }
+        if (processor == null) {
+            throw new NullPointerException("processor is null");
+        }
+        if (!sourceFile.exists()) {
+            throw new FileNotFoundException("File does not exist: " + sourceFile);
+        }
+        if (!sourceFile.isFile() || !sourceFile.canRead()) {
+            throw new IOException("File is not readable: " + sourceFile);
+        }
+        
         try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
             String line;
             while ((line = br.readLine()) != null) {
