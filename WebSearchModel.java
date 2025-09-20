@@ -37,28 +37,47 @@ public class WebSearchModel implements IWebSearchModel {
         this.sourceFile = sourceFile;
     }
 
+    /**
+     * Simulates web search by reading queries from file and notifying observers.
+     * Delegates file reading responsibility to FileQueryReader utility.
+     */
     public void pretendToSearch() {
-        try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
-            while ( true) {
-                String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
-                notifyAllObservers(line);
-            }
+        try {
+            // Delegate file reading to FileQueryReader and focus only on query processing
+            FileQueryReader.readAndProcessQueries(sourceFile, this::processQuery);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Processes a single query by notifying all interested observers.
+     * This method focuses solely on the notification logic.
+     * @param query The query to process
+     */
+    private void processQuery(String query) {
+        notifyAllObservers(query);
+    }
+
+    /**
+     * Registers an observer with its associated filter.
+     * Follows Single Responsibility Principle - only handles observer management.
+     * @param queryObserver The observer to be notified
+     * @param queryFilter The filter that determines when to notify the observer
+     */
     public void addQueryObserver(QueryObserver queryObserver, QueryFilter queryFilter) {
         observers.add(new ObserverFilterPair(queryObserver, queryFilter));
     }
 
-    private void notifyAllObservers(String line) {
+    /**
+     * Notifies all registered observers about a query, but only if their filters approve.
+     * This method focuses solely on the notification logic with filtering.
+     * @param query The query to potentially notify observers about
+     */
+    private void notifyAllObservers(String query) {
         for (ObserverFilterPair pair : observers) {
-            if (pair.filter.shouldNotify(line)) {
-                pair.observer.onQuery(line);
+            if (pair.filter.shouldNotify(query)) {
+                pair.observer.onQuery(query);
             }
         }
     }
