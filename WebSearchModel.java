@@ -11,7 +11,7 @@ public interface IWebSearchModel {
     void addQueryObserver(WebSearchModel.QueryObserver queryObserver, WebSearchModel.QueryFilter queryFilter);
 }
 
-public class WebSearchModel {
+public class WebSearchModel implements IWebSearchModel {
     private final File sourceFile;
     private final List<ObserverFilterPair> observers = new ArrayList<>();
 
